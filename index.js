@@ -1,4 +1,8 @@
-const http = require('http')
+const { request } = require('express');
+const express = require('express')
+const app = express()
+
+// const http = require('http')
 const respuestas = [
     {
         "id": 69,
@@ -225,12 +229,42 @@ const respuestas = [
         }
     }
 ]
-
+/*
 const app = http.createServer((request, response) => {
     response.writeHead(200, {'Content-Type': 'application/json'})
     response.end(JSON.stringify(respuestas))
+})*/
+
+app.get('/', (request, response) => {
+    response.send('<h1> hola mundo </h2>');
 })
 
+app.get('/api/respuestas', (request, response)=> {
+    response.json(respuestas)
+})
+
+app.get('/api/respuestas/:id', (request, response)=> {
+  const id = Number(request.params.id)
+  const respuesta = respuestas.find(respuesta => respuesta.id == id)
+  if(respuesta){
+    response.json(respuesta).status(200).end()
+  }else{
+      response.status(404).end()
+  }
+  
+})
+
+app.delete('/api/respuestas/:id', (request, response)=> {
+    const id = Number(request.params.id)
+   const respuestasD = respuestas.filter(respuesta => respuesta.id != id)
+    if(respuestas){
+      response.json(respuestasD)
+    }else{
+        response.status(204).end()
+    }
+    
+  })
+
+
 const PORT = 3001
-app.listen(PORT)
-console.log(`Servidor corriendo en el puerto ${PORT}`)
+app.listen(PORT, () => {console.log(`Servidor corriendo en el puerto ${PORT}`)} )

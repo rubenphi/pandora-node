@@ -1,8 +1,10 @@
 const express = require("express");
 const cors = require("cors");
 const config = require("./config.js");
-var r = require("rethinkdb");
-const thinkagain = require("thinkagain")(config.rethinkdb);
+
+const thinky = require("thinky")(config.rethinkdb);
+
+const r = thinky.r;
 
 const app = express();
 app.use(cors());
@@ -18,74 +20,19 @@ app.use((request, response, next) => {
 
 let respuestas = [];
 //console.log(JSON.stringify(thinkagain));
-var Respuesta = thinkagain.createModel("cuestionarios", {
-    type: "object",
-    properties: {
-        id: { type: "string" },
-        episodes: { type: "number" },
-        name: { type: "string" },
-    },
+
+
+var Respuesta = thinky.createModel("cuestionarios", {
+    id: String,
+    episodes:Number,
+    name: String 
 });
 
-let respus = [];
 
-Respuesta.orderBy("name")
-    .run()
-    .then(function (result) {
-        console.log(JSON.stringify(result.orderBy(r.desc("episodes"))));
-    });
-
-r.connect({ host: "127.0.0.1", port: 28015 }, function (err, conn) {
-    if (err) throw err;
-
-    r.table("cuestionarios")
-        .orderBy(r.desc("episodes"))
-        .run(conn, function (err, cursor) {
-            if (err) throw err;
-            cursor.toArray(function (err, result) {
-                if (err) throw err;
-                respuestas = result;
-
-                console.log(JSON.stringify(result, null, 2));
-            });
-        });
+Respuesta.orderBy(r.asc("name")).run().then(function (result) {
+    respuestas = result;
 });
 
-// const http = require('http')
-let respuestai = [
-    {
-        id: 69,
-        pregunta_id: 45,
-        grupo_id: 21,
-        opcion_id: 81,
-        cuestionario_id: 3,
-        puntaje: 8,
-        existe: 1,
-        grupoPregunta: "21-45",
-        created_at: "2022-01-28T13:22:40.794682Z",
-        updated_at: "2022-01-28T22:19:42.835416Z",
-        opcion: {
-            id: 81,
-            enunciado: "Un Verbo",
-            correcto: 1,
-            letra: "A",
-            existe: 1,
-            letraPregunta: "A-45",
-            correctoPregunta: "1-45",
-            pregunta_id: 45,
-            created_at: "2022-01-27T21:37:19.000000Z",
-            updated_at: "2022-01-27T21:37:19.000000Z",
-        },
-        grupo: {
-            id: 21,
-            nombre: "grupo 3",
-            existe: 1,
-            curso_id: 1,
-            created_at: "2022-01-27T21:49:59.000000Z",
-            updated_at: "2022-01-27T21:49:59.000000Z",
-        },
-    },
-];
 /*
 const app = http.createServer((request, response) => {
     response.writeHead(200, {'Content-Type': 'application/json'})
@@ -97,7 +44,7 @@ app.get("/", (request, response) => {
 });
 
 app.get("/api/respuestas", (request, response) => {
-    response.json(respus);
+    response.json(respuestas);
 });
 
 app.post("/api/respuestas", (request, response) => {

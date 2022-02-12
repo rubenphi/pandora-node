@@ -2,7 +2,8 @@ module.exports = {
     "env": {
         "browser": true,
         "commonjs": true,
-        "es2021": true
+        "es2021": true,
+        "modules": true,
     },
     "extends": "eslint:recommended",
     "parserOptions": {
@@ -25,5 +26,8 @@ module.exports = {
             "error",
             "always"
         ]
+    },
+    "parserOptions":{
+        "sourceType": "module"
     }
 };

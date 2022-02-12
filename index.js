@@ -1,5 +1,9 @@
 const express = require("express");
 const cors = require("cors");
+const config = require("./config.js");
+var r = require("rethinkdb");
+const thinkagain = require("thinkagain")(config.rethinkdb);
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -12,8 +16,43 @@ app.use((request, response, next) => {
     next();
 });
 
+let respuestas = [];
+//console.log(JSON.stringify(thinkagain));
+var Respuesta = thinkagain.createModel("cuestionarios", {
+    type: "object",
+    properties: {
+        id: { type: "string" },
+        episodes: { type: "number" },
+        name: { type: "string" },
+    },
+});
+
+let respus = [];
+
+Respuesta.orderBy("name")
+    .run()
+    .then(function (result) {
+        console.log(JSON.stringify(result.orderBy(r.desc("episodes"))));
+    });
+
+r.connect({ host: "127.0.0.1", port: 28015 }, function (err, conn) {
+    if (err) throw err;
+
+    r.table("cuestionarios")
+        .orderBy(r.desc("episodes"))
+        .run(conn, function (err, cursor) {
+            if (err) throw err;
+            cursor.toArray(function (err, result) {
+                if (err) throw err;
+                respuestas = result;
+
+                console.log(JSON.stringify(result, null, 2));
+            });
+        });
+});
+
 // const http = require('http')
-let respuestas = [
+let respuestai = [
     {
         id: 69,
         pregunta_id: 45,
@@ -45,7 +84,7 @@ let respuestas = [
             created_at: "2022-01-27T21:49:59.000000Z",
             updated_at: "2022-01-27T21:49:59.000000Z",
         },
-    }
+    },
 ];
 /*
 const app = http.createServer((request, response) => {
@@ -58,7 +97,7 @@ app.get("/", (request, response) => {
 });
 
 app.get("/api/respuestas", (request, response) => {
-    response.json(respuestas);
+    response.json(respus);
 });
 
 app.post("/api/respuestas", (request, response) => {
@@ -97,11 +136,10 @@ app.delete("/api/respuestas/:id", (request, response) => {
     response.status(204).end();
 });
 
-
 app.use((request, response) => {
     const ruta = request.path;
     response.status(404).json({
-        "error": "la ruta " + ruta +  " no ha sido encontrada",
+        error: "la ruta " + ruta + " no ha sido encontrada",
     });
 });
 const PORT = 3001;

@@ -1,32 +1,32 @@
 const config = "./config/default.js";
 const thinky = require("thinky")(config.rethinkdb);
-const Respuesta = "models.js";
+const Respuesta = "./model";
 const r = thinky.r;
 
-let respuestas = [];
+
 //console.log(JSON.stringify(thinkagain));
 
+module.exports = {
 
-
-function index(request, response){
+ index(request, response) {
     Respuesta.orderBy(r.asc("id")).run().then(function (result) {
         respuestas = result;
     });
-    response.json(respuestas);
-}
+    return response.json(respuestas);
+},
 
-function show(request, response){
+ show(request, response) {
     const id = Number(request.params.id);
     const respuesta = respuestas.find((respuesta) => respuesta.id == id);
     if (respuesta) {
-        response.json(respuesta).status(200).end();
+        return response.json(respuesta).status(200).end();
     } else {
-        response.status(404).end();
+        return response.status(404).end();
     }
 
-}
+},
 
-function store(request, response){
+ store(request, response) {
     const respuesta = request.body;
     const ids = respuestas.map((respuesta) => respuesta.id);
     const maxId = Math.max(...ids);
@@ -43,16 +43,17 @@ function store(request, response){
     };
 
     respuestas = [...respuestas, newRespuesta];
-    response.json(newRespuesta);
+    return response.json(newRespuesta);
 
-}
+},
 
-function update(request, response){
+ update(request, response) {
 
-}
+},
 
-function remove(request, response){
+ remove(request, response) {
 
-}
+},
 
-module.exports = respuestas, index, show, store, update, remove;
+};
+

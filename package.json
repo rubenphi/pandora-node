@@ -2,11 +2,11 @@
   "name": "pandora-node",
   "version": "1.0.0",
   "description": "API pandora en node",
-  "main": "index.js",
+  "main": "bin/www",
   "scripts": {
-    "dev": "nodemon index.js",
+    "dev": "nodemon bin/www",
     "lint": "eslint .",
-    "start": "node index.js",
+    "start": "node bin/www",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "rubenphi",

@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
-const routes = require('./routes');
+global.__base = __dirname + "/" ;
+const routes = require("./routes");
 const app = express();
 
 app.use(cors());
@@ -12,13 +13,6 @@ app.use((request, response, next) => {
     next();
 });
 
-
-app.get("/", (request, response) => {
-    response.send("<h1> hola mundo </h2>");
-});
-
-
-
-
+app.use("/", routes);
 
 module.exports = app;

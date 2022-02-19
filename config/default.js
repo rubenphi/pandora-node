@@ -6,7 +6,7 @@ module.exports = {
         db: "test",
     },
     app: {
-        DOMAIN: "localhost:8200",
+        DOMAIN:"127.0.0.1:8200",
         PORT: 8200,
     },
 };

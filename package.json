@@ -23,6 +23,6 @@
     "express": "4.17.2",
     "rethinkdb": "^2.4.2",
     "thinkagain": "^0.1.6",
-    "thinky": "^1.15.1"
+    "thinky": "2.3.9"
   }
 }

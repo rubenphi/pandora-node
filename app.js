@@ -14,5 +14,12 @@ app.use((request, response, next) => {
 });
 
 app.use("/", routes);
+app.use((request, response) => {
+    const ruta = request.path;
+    response.status(404).json({
+        error: "la ruta " + ruta + " no ha sido encontrada",
+        code: 404
+    });
+});
 
 module.exports = app;

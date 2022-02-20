@@ -1,10 +1,10 @@
 const model = require("./model");
-
+const services = require(__base + "/services");
 
 //console.log(JSON.stringify(thinkagain));
 
 module.exports = {
-    index(request, response) {
+    index(request, response) { //show all respuestas
         model.Respuesta.orderBy(model.r.asc("id"))
             .run()
             .then(function (result) {
@@ -12,37 +12,49 @@ module.exports = {
             });
     },
 
-    show(request, response) {
-        const id = Number(request.params.id);
-        const respuesta = respuestas.find((respuesta) => respuesta.id == id);
-        if (respuesta) {
-            return response.json(respuesta).status(200).end();
-        } else {
-            return response.status(404).end();
-        }
+    show(request, response) { //show selected respuesta
+        model.Respuesta.get(request.params.id).run()
+            .then(function (result) {
+                return response.json(result);
+            }).catch(function (result) {
+                return response.status(404).send({ error: result, code: 404 })
+            });
     },
 
-    store(request, response) {
+    async store(request, response) { //save respuesta
+        //used vars
         const respuesta = request.body;
-        const ids = respuestas.map((respuesta) => respuesta.id);
-        const maxId = Math.max(...ids);
-
-        const newRespuesta = {
-            id: maxId + 1,
+        const newRespuesta = new model.Respuesta({
             pregunta_id: respuesta.pregunta_id,
             grupo_id: respuesta.grupo_id,
             opcion_id: respuesta.opcion_id,
             cuestionario_id: respuesta.cuestionario_id,
             puntaje: respuesta.puntaje,
-            existe: respuesta.existe || 1,
-            grupoPregunta: respuesta.grupo_id + "-" + respuesta.pregunta_id,
-        };
+            existe: respuesta.existe || true,
+            grupoPregunta: respuesta.grupo_id + "-" + respuesta.pregunta_id
+        });
+        //method to save respuesta
+        function save() {
+            newRespuesta.saveAll().then(function (result) {
+                return response.json(result)
+            }).catch(function (err) {
+                return response.json({ error: `Schema Error: ${err}` })
+            }).error(function (err) {
+                return response.json({ error: `Schema Error: ${err}` })
+            });
+        }
 
-        respuestas = [...respuestas, newRespuesta];
-        return response.json(newRespuesta);
+        //validation
+        if (await services.isUnique('grupoPregunta', newRespuesta.grupoPregunta) != true) //isUnique
+        {
+            return response.status(400).send({ error: 'El grupo ya respondió', code: 400 })
+        } else {
+            save()
+        }
     },
 
-    update(request, response) {},
+    update(request, response) {
+    },
 
-    remove(request, response) {},
-};
+    remove(request, response) { },
+}

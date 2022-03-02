@@ -1,7 +1,7 @@
 const config = require(__base + "config/default.js");
 const thinky = require("thinky")(config.rethinkdb);
-const type = thinky.type
-const r = thinky.r
+const type = thinky.type;
+const r = thinky.r;
 const Errors = thinky.Errors;
 
 var Respuesta = thinky.createModel("respuestas", {
@@ -12,5 +12,6 @@ var Respuesta = thinky.createModel("respuestas", {
     puntaje: type.number().min(0).required().allowNull(false),
     existe: type.boolean().required().allowNull(false),
     grupoPregunta: type.string().min(1).required().allowNull(false),
-})
+    createdAt: type.date().allowNull(false)
+});
 module.exports = { Respuesta, r, Errors };

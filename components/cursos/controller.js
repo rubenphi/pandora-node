@@ -10,7 +10,7 @@ module.exports = {
     },
 
     async show(request, response) {
-        //show selected respuesta
+        //show selected curso
         let user = await services.userLoged();
         let result = "";
         if (
@@ -39,6 +39,7 @@ module.exports = {
 
     async store(request, response) {
         //save respuesta
+
         //used vars
         let result = "";
         let user = await services.userLoged();
@@ -46,7 +47,8 @@ module.exports = {
             nombre: request.body.nombre,
             createdAt: model.r.now(),
         });
-        //method to save respuesta
+
+        //method to save curso
         function save() {
             curso
                 .saveAll()
@@ -70,6 +72,7 @@ module.exports = {
                 message: "No pueden haber dos cursos con el mismo nombre",
                 code: 400,
             });
+            //is admin?
         } else if (user.rol != "admin") {
             result = response.status(400).send({
                 message: "No puede registrar un curso si no es administrador",
@@ -82,11 +85,14 @@ module.exports = {
     },
 
     async update(request, response) {
-        //save respuesta
+        //update cursos
+
         //used vars
         let user = await services.userLoged();
         let result = "";
         let curso = "";
+
+        //get curso to update
         await model.Curso.get(request.params.id)
             .run()
             .then(function (res) {
@@ -104,7 +110,7 @@ module.exports = {
             createdAt: model.r.now(),
         };
 
-        //method to save respuesta
+        //method to save curso
         function save() {
             model.Curso.save(newCurso, { conflict: "update" })
                 .then(function (res) {
@@ -119,12 +125,14 @@ module.exports = {
         }
 
         //validation
+        //curso does not exist?
 
         if (curso == "") {
             result = response.status(404).send({
                 message: "El curso que deseas actualizar no fue encontrado",
                 code: 404,
             });
+            //is unique?
         } else if (
             (await services.isUniqueOthers(
                 "cursos",
@@ -133,11 +141,11 @@ module.exports = {
                 newCurso.id
             )) != true
         ) {
-            //isUnique
             result = response.status(400).send({
                 message: "No pueden haber dos cursos con el mismo nombre",
                 code: 400,
             });
+            //is admin?
         } else if (user.rol != "admin") {
             result = response.status(400).send({
                 message: "No puede registrar un curso si no es administrador",
@@ -150,10 +158,14 @@ module.exports = {
         return result;
     },
 
+
+    //remove curso
     async remove(request, response) {
         let user = await services.userLoged();
         let result = "";
         let curso = "";
+
+        //get curso to remove
         await model.Curso.get(request.params.id)
             .run()
             .then(function (res) {
@@ -165,12 +177,16 @@ module.exports = {
                     code: 404,
                 });
             });
+
+        //validations 
+        //curso does not exist?
         if (curso == "") {
             result = response.status(404).send({
                 message: "El curso que deseas eliminar no fue encontrado",
                 code: 404,
             });
         }
+        //is admin?
         else if (user.rol != "admin") {
             result = response.status(400).send({
                 message: "No puede eliminar un curso si no es administrador",

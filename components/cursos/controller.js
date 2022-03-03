@@ -2,15 +2,16 @@ const model = require("./model");
 const services = require(__base + "/services");
 
 module.exports = {
+
+    //show all cursos
     index(request, response) {
-        //show all cursos
         model.Curso.run().then(function (result) {
             return response.json(result);
         });
     },
 
+    //show selected curso
     async show(request, response) {
-        //show selected curso
         let user = await services.userLoged();
         let result = "";
         if (
@@ -37,9 +38,8 @@ module.exports = {
         return result;
     },
 
+//save curso
     async store(request, response) {
-        //save respuesta
-
         //used vars
         let result = "";
         let user = await services.userLoged();
@@ -84,9 +84,9 @@ module.exports = {
         return result;
     },
 
+    //update cursos
     async update(request, response) {
-        //update cursos
-
+        
         //used vars
         let user = await services.userLoged();
         let result = "";
@@ -125,8 +125,8 @@ module.exports = {
         }
 
         //validation
-        //curso does not exist?
 
+        //curso does not exist?
         if (curso == "") {
             result = response.status(404).send({
                 message: "El curso que deseas actualizar no fue encontrado",
@@ -179,6 +179,7 @@ module.exports = {
             });
 
         //validations 
+        
         //curso does not exist?
         if (curso == "") {
             result = response.status(404).send({
